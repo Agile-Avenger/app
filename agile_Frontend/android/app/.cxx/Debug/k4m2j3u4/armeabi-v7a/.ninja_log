@@ -1,0 +1,17 @@
+# ninja log v5
+1	38	0	E:/app/app/agile_Frontend/android/app/.cxx/Debug/k4m2j3u4/armeabi-v7a/CMakeFiles/cmake.verify_globs	d1c9b6b4ccf4ba4f
+62	9184	7515188382198692	CMakeFiles/appmodules.dir/E_/app/app/agile_Frontend/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	3c78563c7ea90684
+9184	9376	7515188384325875	E:/app/app/agile_Frontend/android/app/build/intermediates/cxx/Debug/k4m2j3u4/obj/armeabi-v7a/libappmodules.so	990b13f70b84383d
+59	8091	7515188371480911	CMakeFiles/appmodules.dir/OnLoad.cpp.o	14732bfd21756abe
+92	4998	7515188340478725	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/States.cpp.o	e09e6522b84cd132
+80	6323	7515188353625423	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/EventEmitters.cpp.o	4cd827e03e869971
+88	6799	7515188358041175	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/RNGoogleSignInCGenJSI-generated.cpp.o	11ac0c02a0ee051c
+73	6688	7515188357409129	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ShadowNodes.cpp.o	9e881cb344713ad0
+65	7075	7515188361156837	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/RNGoogleSignInCGen-generated.cpp.o	8d6e591bd331bc0e
+84	8253	7515188373117038	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/Props.cpp.o	d69557546af1e0c8
+69	8280	7515188373273401	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ComponentDescriptors.cpp.o	cf4ffeef1bc087f3
+30	394	7515218823452915	build.ninja	2435ff441dff1672
+0	9	0	clean	bd132aeb62db9022
+38	410	7515218823452915	build.ninja	2435ff441dff1672
+1	20	0	E:/app/app/agile_Frontend/android/app/.cxx/Debug/k4m2j3u4/armeabi-v7a/CMakeFiles/cmake.verify_globs	d1c9b6b4ccf4ba4f
+0	7	0	clean	bd132aeb62db9022

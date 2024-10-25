@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "494988082252",
+    "project_id": "medidignose",
+    "storage_bucket": "medidignose.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494988082252:android:1970317affa450d72ec8e9",
+        "android_client_info": {
+          "package_name": "com.agile_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDszcQSe8XW3tOseoT_oa5er8rlVnmmjTQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

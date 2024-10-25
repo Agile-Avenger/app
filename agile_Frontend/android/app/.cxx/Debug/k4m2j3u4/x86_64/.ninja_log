@@ -1,0 +1,17 @@
+# ninja log v5
+1	21	0	E:/app/app/agile_Frontend/android/app/.cxx/Debug/k4m2j3u4/x86_64/CMakeFiles/cmake.verify_globs	89ce8bb2765a13e8
+90	4879	7515188557010722	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/States.cpp.o	b1661749f75f847b
+40	6504	7515188572581477	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/EventEmitters.cpp.o	474dc92e8b5ab167
+33	7444	7515188582644422	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/RNGoogleSignInCGenJSI-generated.cpp.o	23f07cba20fbd04d
+18	8813	7515188596439525	CMakeFiles/appmodules.dir/E_/app/app/agile_Frontend/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	b21eabdbc8e7a146
+14	8413	7515188592478380	CMakeFiles/appmodules.dir/OnLoad.cpp.o	6e3f8bd2b5a2bd3b
+8813	8962	7515188597999774	E:/app/app/agile_Frontend/android/app/build/intermediates/cxx/Debug/k4m2j3u4/obj/x86_64/libappmodules.so	cff6e0a6815c2be5
+60	6997	7515188578254384	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ShadowNodes.cpp.o	ba91b7734c6a4da7
+24	7225	7515188580371358	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/RNGoogleSignInCGen-generated.cpp.o	b064ad8eec729cd
+27	8317	7515188591461021	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/Props.cpp.o	58f7fcb0e6703a79
+21	8398	7515188592248017	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ComponentDescriptors.cpp.o	c9b080c0b595ef6d
+20	304	7515218831818651	build.ninja	9cbcfa198b2a6012
+0	10	0	clean	bd132aeb62db9022
+21	287	7515218831818651	build.ninja	9cbcfa198b2a6012
+1	20	0	E:/app/app/agile_Frontend/android/app/.cxx/Debug/k4m2j3u4/x86_64/CMakeFiles/cmake.verify_globs	89ce8bb2765a13e8
+0	8	0	clean	bd132aeb62db9022

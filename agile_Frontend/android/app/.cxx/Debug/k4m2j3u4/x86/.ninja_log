@@ -1,0 +1,17 @@
+# ninja log v5
+1	21	0	E:/app/app/agile_Frontend/android/app/.cxx/Debug/k4m2j3u4/x86/CMakeFiles/cmake.verify_globs	28519eb6ebd57ba3
+96	4620	7515188451879989	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/States.cpp.o	f38c6ac7f571afeb
+50	5144	7515188457102948	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/EventEmitters.cpp.o	4d1692a735e162df
+54	5996	7515188465781598	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/RNGoogleSignInCGenJSI-generated.cpp.o	c2af96fb24814748
+8396	8529	7515188491219224	E:/app/app/agile_Frontend/android/app/build/intermediates/cxx/Debug/k4m2j3u4/obj/x86/libappmodules.so	22b6f688ca1e1625
+21	8395	7515188489754528	CMakeFiles/appmodules.dir/E_/app/app/agile_Frontend/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	e7d0d5108a37eed3
+17	7183	7515188477709651	CMakeFiles/appmodules.dir/OnLoad.cpp.o	56c83a5a475c97ae
+25	6185	7515188467433986	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/RNGoogleSignInCGen-generated.cpp.o	ebe036b3bf90c6ab
+38	6368	7515188469658388	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ShadowNodes.cpp.o	e13dba1ed7c88b7e
+34	7807	7515188483939067	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/Props.cpp.o	47ac5346a2b52c0b
+28	7862	7515188484408805	RNGoogleSignInCGen_autolinked_build/CMakeFiles/react_codegen_RNGoogleSignInCGen.dir/react/renderer/components/RNGoogleSignInCGen/ComponentDescriptors.cpp.o	99178775fa003c5f
+21	315	7515218828137882	build.ninja	20805d32721d7942
+0	9	0	clean	bd132aeb62db9022
+21	301	7515218828137882	build.ninja	20805d32721d7942
+1	20	0	E:/app/app/agile_Frontend/android/app/.cxx/Debug/k4m2j3u4/x86/CMakeFiles/cmake.verify_globs	28519eb6ebd57ba3
+0	8	0	clean	bd132aeb62db9022
