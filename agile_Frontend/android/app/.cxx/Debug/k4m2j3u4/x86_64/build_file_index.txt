@@ -1,2 +1,0 @@
-E:\app\app\agile_Frontend\node_modules\@react-native-google-signin\google-signin\android\build\generated\source\codegen\jni\CMakeLists.txt
-E:\app\app\agile_Frontend\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt
