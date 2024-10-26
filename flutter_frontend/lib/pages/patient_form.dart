@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import for date formatting
+import 'package:flutter_frontend/pages/home_page.dart';
+import 'package:intl/intl.dart';
 
 class PatientForm extends StatefulWidget {
   final String userEmail;
   final String userName;
 
-  // Constructor to accept the user's email and name
   PatientForm({required this.userEmail, required this.userName});
 
   @override
@@ -26,152 +26,253 @@ class _PatientFormState extends State<PatientForm> {
   @override
   void initState() {
     super.initState();
-    name = widget.userName; // Set default name from login
-    email = widget.userEmail; // Set default email from login
+    name = widget.userName;
+    email = widget.userEmail;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Patient Form')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                initialValue: name,
-                decoration: const InputDecoration(labelText: 'Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  name = value;
-                },
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          child: Container(
+            width: 800, // Set desired width for the card
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [Colors.grey.shade900, Colors.black],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              TextFormField(
-                initialValue: email,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null ||
-                      value.isEmpty ||
-                      !RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  email = value;
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Age'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your age';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  age = int.tryParse(value) ?? 0;
-                },
-              ),
-              DropdownButtonFormField<String>(
-                value: gender,
-                decoration: const InputDecoration(labelText: 'Gender'),
-                items: <String>['Male', 'Female', 'Other']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    gender = value!;
-                  });
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Contact Number'),
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your contact number';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  number = value;
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Medical History'),
-                maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your medical history';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  medicalHistory = value;
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Physician'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your physician\'s name';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  physician = value;
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Last Visit Date'),
-                readOnly: true,
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: lastVisit,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (pickedDate != null && pickedDate != lastVisit) {
-                    setState(() {
-                      lastVisit = pickedDate;
-                    });
-                  }
-                },
-                controller: TextEditingController(
-                  text: DateFormat('yyyy-MM-dd').format(lastVisit),
+              boxShadow: [
+                const BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
                 ),
+              ],
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Event Registration',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Register with us to get more details.',
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(
+                    initialValue: name,
+                    label: 'Name',
+                    hint: 'Enter your name',
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'Please enter your name'
+                        : null,
+                    onChanged: (value) => name = value,
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    initialValue: email,
+                    label: 'Email',
+                    hint: 'Enter your email',
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'Please enter your email'
+                        : null,
+                    onChanged: (value) => email = value,
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    label: 'Phone',
+                    hint: 'Enter your contact number',
+                    keyboardType: TextInputType.phone,
+                    onChanged: (value) => number = value,
+                  ),
+                  const SizedBox(height: 15),
+                  _buildDropdown(
+                    value: gender,
+                    label: 'Gender',
+                    items: ['Male', 'Female', 'Other'],
+                    onChanged: (value) => setState(() => gender = value!),
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    label: 'Age',
+                    hint: 'Enter your age',
+                    keyboardType: TextInputType.number,
+                    validator: (value) => (value == null || value.isEmpty)
+                        ? 'Please enter your age'
+                        : null,
+                    onChanged: (value) => age = int.tryParse(value) ?? 0,
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    label: 'Medical History',
+                    hint: 'Enter your medical history',
+                    maxLines: 3,
+                    onChanged: (value) => medicalHistory = value,
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    label: 'Physician',
+                    hint: 'Enter your physician\'s name',
+                    onChanged: (value) => physician = value,
+                  ),
+                  const SizedBox(height: 15),
+                  GestureDetector(
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: lastVisit,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime.now(),
+                        builder: (context, child) {
+                          return Theme(
+                            data: ThemeData.dark().copyWith(
+                              colorScheme: ColorScheme.dark(
+                                primary: Colors.tealAccent,
+                                onPrimary: Colors.black,
+                                surface: Colors.grey.shade800,
+                                onSurface: Colors.white,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (pickedDate != null && pickedDate != lastVisit) {
+                        setState(() => lastVisit = pickedDate);
+                      }
+                    },
+                    child: AbsorbPointer(
+                      child: _buildTextField(
+                        label: 'Last Visit Date',
+                        hint: DateFormat('yyyy-MM-dd').format(lastVisit),
+                        onChanged: (String) {},
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: 150, // Set desired width
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF3b82f6),
+                            Color(0xFF9333ea),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          if (_formKey.currentState!.validate()) {
+                            // Navigate to HomePage on successful form validation
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Center(
+                          child: Text(
+                            'Sign me up',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Process data (e.g., save to database)
-                    print(
-                        'Name: $name, Email: $email, Age: $age, Gender: $gender, '
-                        'Number: $number, Medical History: $medicalHistory, Physician: $physician, '
-                        'Last Visit: ${DateFormat('yyyy-MM-dd').format(lastVisit)}');
-                  }
-                },
-                child: const Text('Submit'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    String? initialValue,
+    required String label,
+    required String hint,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+    required Function(String) onChanged,
+    String? Function(String?)? validator, // Optional validator
+  }) {
+    return TextFormField(
+      initialValue: initialValue,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      validator: validator, // Use the optional validator
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildDropdown({
+    required String value,
+    required String label,
+    required List<String> items,
+    required Function(String?) onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      dropdownColor: Colors.grey.shade800,
+      iconEnabledColor: Colors.white,
+      items: items.map((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
     );
   }
 }

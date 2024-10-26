@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.medidignose">
     <application
-        android:label="flutter_frontend"
+        android:label="medidignose"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

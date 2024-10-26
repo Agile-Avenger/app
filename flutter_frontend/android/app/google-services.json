@@ -9,29 +9,23 @@
       "client_info": {
         "mobilesdk_app_id": "1:494988082252:android:c6c723612dabdade2ec8e9",
         "android_client_info": {
-          "package_name": "com.agile_frontend"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDszcQSe8XW3tOseoT_oa5er8rlVnmmjTQ"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:494988082252:android:c6c723612dabdade2ec8e9",
-        "android_client_info": {
           "package_name": "com.example.medidignose"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "494988082252-pc8kj6mq7kpsr1olct6r80mi95eu83s9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.medidignose",
+            "certificate_hash": "cfb077e73101f98cc2504f0d72893b961a6c7095"
+          }
+        },
+        {
+          "client_id": "494988082252-jbgktisi035n5jgaa0mb5f743bupbi2u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDszcQSe8XW3tOseoT_oa5er8rlVnmmjTQ"
@@ -39,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "494988082252-0jijvtu3ktklds05riia4u5uurlf2ikd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "494988082252-vku1av4u1q2hv11u9tp0u77qk3p8rms2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterFrontend"
+              }
+            }
+          ]
         }
       }
     }
