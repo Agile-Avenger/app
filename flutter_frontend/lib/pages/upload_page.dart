@@ -37,14 +37,13 @@ class _UploadPageState extends State<UploadPage> {
 
   void _analyzeImage() async {
     if (_scanType == 'CT scan') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'CT scan analysis is a work in progress. Please try again later.'),
-          backgroundColor: Color(0xFF3b82f6),
-        ),
-      );
-      return;
+      setState(() {
+        _diseaseType = 'Tuberculosis'; // Automatically set disease type
+      });
+    } else if (_scanType == 'X-ray') {
+      setState(() {
+        _diseaseType = 'Pneumonia'; // Automatically set disease type
+      });
     }
 
     if (_filePath != null && _scanType != null && _diseaseType != null) {
@@ -57,7 +56,7 @@ class _UploadPageState extends State<UploadPage> {
       if (_scanType == 'X-ray' && _diseaseType == 'Pneumonia') {
         url =
             'https://flask-app-616464352400.us-central1.run.app/predict_pneumonia';
-      } else if (_scanType == 'X-ray' && _diseaseType == 'Tuberculosis') {
+      } else if (_scanType == 'CT scan' && _diseaseType == 'Tuberculosis') {
         url = 'https://flask-app-616464352400.us-central1.run.app/predict_tb';
       } else {
         setState(() {
@@ -82,24 +81,24 @@ class _UploadPageState extends State<UploadPage> {
         final response = await request.send();
 
         if (response.statusCode == 200) {
-  final responseData = await response.stream.bytesToString();
-  final jsonResult = json.decode(responseData);
+          final responseData = await response.stream.bytesToString();
+          final jsonResult = json.decode(responseData);
 
-  String analysisResult;
+          String analysisResult;
 
-  // Try to handle both old and new response formats
-  try {
-    if (jsonResult.containsKey('study_info')) {
-      // New format
-      String classification = jsonResult['study_info']['classification'] ?? 'N/A';
-      String confidence = jsonResult['study_info']['confidence']?.toString() ?? 'N/A';
-      String confidenceStability = jsonResult['study_info']['confidence_stability']?.toString() ?? 'N/A';
-      String findings = jsonResult['findings'] ?? 'N/A';
-      String impression = jsonResult['impression'] ?? 'N/A';
-      List<String> recommendations = 
-          (jsonResult['recommendations'] as List<dynamic>?)?.cast<String>() ?? ['N/A'];
+          // Try to handle both old and new response formats
+          try {
+            if (jsonResult.containsKey('study_info')) {
+              // New format
+              String classification = jsonResult['study_info']['classification'] ?? 'N/A';
+              String confidence = jsonResult['study_info']['confidence']?.toString() ?? 'N/A';
+              String confidenceStability = jsonResult['study_info']['confidence_stability']?.toString() ?? 'N/A';
+              String findings = jsonResult['findings'] ?? 'N/A';
+              String impression = jsonResult['impression'] ?? 'N/A';
+              List<String> recommendations =
+                  (jsonResult['recommendations'] as List<dynamic>?)?.cast<String>() ?? ['N/A'];
 
-      analysisResult = '''
+              analysisResult = '''
 Classification: $classification
 Confidence: $confidence
 Stability: $confidenceStability
@@ -108,43 +107,43 @@ Impression: $impression
 Recommendations:
 - ${recommendations.join("\n- ")}
 ''';
-    } else if (jsonResult.containsKey('prediction')) {
-      // Old format
-      List<dynamic> predictions = jsonResult['prediction'][0];
-      analysisResult = '''
+            } else if (jsonResult.containsKey('prediction')) {
+              // Old format
+              List<dynamic> predictions = jsonResult['prediction'][0];
+              analysisResult = '''
 Normal: ${predictions[0].toStringAsFixed(2)}
 ${_diseaseType}: ${predictions[1].toStringAsFixed(2)}
 ''';
-    } else {
-      throw Exception('Unknown response format');
-    }
+            } else {
+              throw Exception('Unknown response format');
+            }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultsPage(
-          imagePath: _filePath!,
-          diseaseType: _diseaseType!,
-          analysisResult: analysisResult,
-        ),
-      ),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Error processing response data. Please try again.'),
-        backgroundColor: Color(0xFF3b82f6),
-      ),
-    );
-  }
-} else {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text('Error in analyzing image. Please try again.'),
-      backgroundColor: Color(0xFF3b82f6),
-    ),
-  );
-}
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultsPage(
+                  imagePath: _filePath!,
+                  diseaseType: _diseaseType!,
+                  analysisResult: analysisResult,
+                ),
+              ),
+            );
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Error processing response data. Please try again.'),
+                backgroundColor: Color(0xFF3b82f6),
+              ),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error in analyzing image. Please try again.'),
+              backgroundColor: Color(0xFF3b82f6),
+            ),
+          );
+        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -168,15 +167,9 @@ ${_diseaseType}: ${predictions[1].toStringAsFixed(2)}
 
   List<String> getDiseaseOptions() {
     if (_scanType == 'X-ray') {
-      return ['Pneumonia', 'Tuberculosis'];
+      return ['Pneumonia'];
     } else if (_scanType == 'CT scan') {
-      return [
-        'COVID-19',
-        'Brain Tumor',
-        'Skin Cancer',
-        'Diabetic Retinopathy',
-        'Breast Cancer'
-      ];
+      return ['Tuberculosis'];
     }
     return [];
   }
@@ -290,42 +283,51 @@ ${_diseaseType}: ${predictions[1].toStringAsFixed(2)}
                                       children: [
                                         const Icon(
                                           Icons.check_circle,
-                                          color: Color(0xFF3b82f6),
+                                          color: Colors.green,
+                                          size: 50,
                                         ),
                                         const SizedBox(height: 10),
                                         Text(
-                                          '✓ Image selected: ${_filePath!.split('/').last}',
+                                          'Selected file: ${_filePath!.split('/').last}',
                                           style: const TextStyle(
-                                            color: Color(0xFF3b82f6),
-                                          ),
-                                          textAlign: TextAlign.center,
+                                              color: Colors.white70),
                                         ),
                                       ],
                                     ),
                             ),
                           ),
                           SizedBox(height: isSmallScreen ? 16 : 20),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: DropdownButton<String>(
-                              value: _scanType,
-                              hint: const Text(
-                                'Select Scan Type',
-                                style: TextStyle(color: Colors.white70),
+                          DropdownButton<String>(
+                            value: _scanType,
+                            hint: const Text('Select scan type'),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'X-ray',
+                                child: Text('X-ray'),
                               ),
-                              isExpanded: true,
-                              icon: const Icon(Icons.arrow_drop_down,
-                                  color: Colors.white70),
-                              underline: Container(),
-                              items: <String>[
-                                'X-ray',
-                                'CT scan'
-                              ].map<DropdownMenuItem<String>>((String value) {
+                              DropdownMenuItem(
+                                value: 'CT scan',
+                                child: Text('CT scan'),
+                              ),
+                            ],
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _scanType = newValue;
+                                _diseaseType = null; // Reset disease type
+                              });
+                            },
+                            dropdownColor: const Color(0xFF1f1f1f),
+                            iconEnabledColor: Colors.white,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          const SizedBox(height: 16),
+                          if (_scanType != null) ...[
+                            DropdownButton<String>(
+                              value: _diseaseType,
+                              hint: const Text('Select disease type'),
+                              items: getDiseaseOptions()
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Text(value),
@@ -333,88 +335,24 @@ ${_diseaseType}: ${predictions[1].toStringAsFixed(2)}
                               }).toList(),
                               onChanged: (String? newValue) {
                                 setState(() {
-                                  _scanType = newValue;
-                                  _diseaseType = null;
+                                  _diseaseType = newValue;
                                 });
                               },
-                              dropdownColor: const Color(0xFF1a1a1a),
+                              dropdownColor: const Color(0xFF1f1f1f),
+                              iconEnabledColor: Colors.white,
                               style: const TextStyle(color: Colors.white),
                             ),
-                          ),
-                          SizedBox(height: isSmallScreen ? 16 : 20),
-                          if (_scanType != null && _scanType != 'CT scan')
-                            Container(
-                              width: double.infinity,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.05),
+                          ],
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _analyzeImage,
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.all(isSmallScreen ? 16 : 20), backgroundColor: const Color(0xFF3b82f6),
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: DropdownButton<String>(
-                                value: _diseaseType,
-                                hint: const Text(
-                                  'Select Disease Category',
-                                  style: TextStyle(color: Colors.white70),
-                                ),
-                                isExpanded: true,
-                                icon: const Icon(Icons.arrow_drop_down,
-                                    color: Colors.white70),
-                                underline: Container(),
-                                items: getDiseaseOptions()
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    _diseaseType = newValue;
-                                  });
-                                },
-                                dropdownColor: const Color(0xFF1a1a1a),
-                                style: const TextStyle(color: Colors.white),
-                              ),
                             ),
-                          SizedBox(height: isSmallScreen ? 20 : 24),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color(0xFF3b82f6),
-                                  Color(0xFF9333ea),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      const Color(0xFF3b82f6).withOpacity(0.3),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: TextButton(
-                              onPressed: _analyzeImage,
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: isSmallScreen ? 14 : 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              child: Text(
-                                'Analyze Image',
-                                style: TextStyle(
-                                  fontSize: isSmallScreen ? 16 : 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            child: const Text('Analyze Image'),
                           ),
                         ],
                       ),
