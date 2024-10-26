@@ -1,8 +1,26 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_frontend/pages/login_screen.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  // Example user data; in a real app, this could come from a database
+  final String? gender;
+  final String? email;
+  final String? phone;
+  final String? medicalHistory;
+  final String? physician;
+  final String? lastVisit;
+
+  const ProfilePage({
+    Key? key,
+    this.gender,
+    this.email,
+    this.phone,
+    this.medicalHistory,
+    this.physician,
+    this.lastVisit,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +92,8 @@ class ProfilePage extends StatelessWidget {
                       content: _buildMedicalInfo(),
                     ),
                     SizedBox(height: 30),
-                    _buildLogoutButton(),
+                    _buildLogoutButton(
+                        context), // Pass context to logout button
                     SizedBox(height: 30),
                   ],
                 ),
@@ -90,38 +109,36 @@ class ProfilePage extends StatelessWidget {
     return Column(
       children: [
         Stack(
-  alignment: Alignment.center,
-  children: [
-    Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF3b82f6),
-            Color(0xFF9333ea),
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF3b82f6),
+                    Color(0xFF9333ea),
+                  ],
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(3),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF1a1a1a),
+                  ),
+                  child: CircleAvatar(
+                    radius: 55,
+                    backgroundImage: AssetImage('assets/user3.jpg'),
+                  ),
+                ),
+              ),
+            ),
           ],
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(3),
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFF1a1a1a),
-          ),
-          child: CircleAvatar(
-            radius: 55,
-            backgroundImage: AssetImage('assets/user3.jpg'),
-          ),
-        ),
-      ),
-    ),
-  ],
-).animate()
-  .fadeIn(duration: 600.ms)
-  .scale(begin: Offset(0.8, 0.8)), // Corrected line
+        ).animate().fadeIn(duration: 600.ms).scale(begin: Offset(0.8, 0.8)),
         SizedBox(height: 20),
         Text(
           'John Doe',
@@ -249,19 +266,19 @@ class ProfilePage extends StatelessWidget {
           _buildInfoRow(
             icon: Icons.person,
             label: 'Gender',
-            value: 'Male',
+            value: gender ?? 'None', // Show "None" if gender is null
           ),
           SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.email,
             label: 'Email',
-            value: 'john.doe@example.com',
+            value: email ?? 'None', // Show "None" if email is null
           ),
           SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.phone,
             label: 'Phone',
-            value: '+1 (555) 123-4567',
+            value: phone ?? 'None', // Show "None" if phone is null
           ),
         ],
       ),
@@ -276,19 +293,20 @@ class ProfilePage extends StatelessWidget {
           _buildInfoRow(
             icon: Icons.medical_services,
             label: 'Medical History',
-            value: 'Diabetes',
+            value: medicalHistory ??
+                'None', // Show "None" if medical history is null
           ),
           SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.person_outline,
             label: 'Physician',
-            value: 'Dr. Smith',
+            value: physician ?? 'None', // Show "None" if physician is null
           ),
           SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.calendar_today,
             label: 'Last Visit',
-            value: '2024-10-26',
+            value: lastVisit ?? 'None', // Show "None" if last visit is null
           ),
         ],
       ),
@@ -326,8 +344,8 @@ class ProfilePage extends StatelessWidget {
               value,
               style: TextStyle(
                 fontSize: 16,
+                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -336,51 +354,22 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoutButton() {
-    return Container(
-      width: double.infinity,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () {
-            // Implement logout functionality
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF3b82f6),
-                  Color(0xFF9333ea),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0xFF3b82f6).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: Offset(0, 8),
-                ),
-              ],
-            ),
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.logout, color: Colors.white, size: 20),
-                SizedBox(width: 10),
-                Text(
-                  'Logout',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
+  Widget _buildLogoutButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        await FirebaseAuth.instance.signOut();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      },
+      child: Text('Logout'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Color(0xFF3b82f6),
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms, delay: 800.ms).slideY(begin: 0.2);
+    );
   }
 }

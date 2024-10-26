@@ -1,6 +1,10 @@
+import 'dart:math' show pi, sin;
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'dart:math' show pi, sin;
+import 'package:flutter_frontend/pages/login_screen.dart';
+
 import 'home_page.dart';
 
 class LandingPage extends StatefulWidget {
@@ -10,7 +14,8 @@ class LandingPage extends StatefulWidget {
   State<LandingPage> createState() => _LandingPageState();
 }
 
-class _LandingPageState extends State<LandingPage> with SingleTickerProviderStateMixin {
+class _LandingPageState extends State<LandingPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isHovered = false;
 
@@ -83,18 +88,21 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
                         ),
                       ),
                       child: Padding(
-  padding: const EdgeInsets.all(20.0),
-  child: ClipOval(
-    child: Image.asset(
-      'assets/scanlogo.png',
-      width: 120, // Set the desired width
-      height: 120, // Set the desired height
-      fit: BoxFit.cover, // Ensures the image covers the circular area
-      ),
-  ),
-),
+                        padding: const EdgeInsets.all(20.0),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/scanlogo.png',
+                            width: 120, // Set the desired width
+                            height: 120, // Set the desired height
+                            fit: BoxFit
+                                .cover, // Ensures the image covers the circular area
+                          ),
+                        ),
+                      ),
                     ),
-                  ).animate().scale(duration: 800.ms, curve: Curves.easeOutBack),
+                  )
+                      .animate()
+                      .scale(duration: 800.ms, curve: Curves.easeOutBack),
                   SizedBox(height: 40),
                   // Main title with gradient
                   ShaderMask(
@@ -125,7 +133,10 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
                       color: Colors.white70,
                       height: 1.6,
                     ),
-                  ).animate().fadeIn(duration: 800.ms, delay: 200.ms).slideY(begin: 0.3),
+                  )
+                      .animate()
+                      .fadeIn(duration: 800.ms, delay: 200.ms)
+                      .slideY(begin: 0.3),
                   SizedBox(height: 60),
                   // Stats row
                   _buildStatsRow(),
@@ -269,7 +280,8 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: MediaQuery.of(context).size.width * 0.020, // Responsive font size
+              fontSize: MediaQuery.of(context).size.width *
+                  0.020, // Responsive font size
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -279,16 +291,20 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
             description,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: MediaQuery.of(context).size.width * 0.014, // Responsive font size
+              fontSize: MediaQuery.of(context).size.width *
+                  0.014, // Responsive font size
               color: Colors.white70,
             ),
           ),
         ],
       ),
-    ) .animate()
-  .fadeIn(duration: Duration(milliseconds: 800), delay: Duration(milliseconds: delay))
-  .scale(begin: Offset(0.8, 0.8)); // Use Offset for uniform scalingset
-}
+    )
+        .animate()
+        .fadeIn(
+            duration: Duration(milliseconds: 800),
+            delay: Duration(milliseconds: delay))
+        .scale(begin: Offset(0.8, 0.8)); // Use Offset for uniform scalingset
+  }
 
   Widget _buildEnterButton(BuildContext context) {
     return MouseRegion(
@@ -296,23 +312,47 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: Duration(milliseconds: 200),
-        transform: Matrix4.identity()
-          ..scale(_isHovered ? 1.05 : 1.0),
+        transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
         child: GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-                transitionDuration: Duration(milliseconds: 800),
-              ),
-            );
+          onTap: () async {
+            // Check if the user is logged in
+            User? user = FirebaseAuth.instance.currentUser;
+
+            if (user != null) {
+              // User is logged in, navigate to HomePage
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      HomePage(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  transitionDuration: Duration(milliseconds: 800),
+                ),
+              );
+            } else {
+              // User is not logged in, navigate to LoginPage
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      LoginScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  transitionDuration: Duration(milliseconds: 800),
+                ),
+              );
+            }
           },
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 48, vertical: 24),
@@ -426,19 +466,19 @@ class BackgroundPainter extends CustomPainter {
     for (var i = 0; i < 5; i++) {
       final phase = animation.value * 2 * pi + i * pi / 2;
       paint.color = i.isEven ? color1 : color2;
-      
+
       path.reset();
       path.moveTo(0, size.height * 0.5);
-      
+
       for (var x = 0; x < size.width; x++) {
         final y = sin(x * 0.01 + phase) * 50 + size.height * 0.5;
         path.lineTo(x.toDouble(), y);
       }
-      
+
       path.lineTo(size.width, size.height);
       path.lineTo(0, size.height);
       path.close();
-      
+
       canvas.drawPath(path, paint);
     }
   }
