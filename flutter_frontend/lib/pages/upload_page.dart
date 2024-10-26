@@ -82,33 +82,69 @@ class _UploadPageState extends State<UploadPage> {
         final response = await request.send();
 
         if (response.statusCode == 200) {
-          final responseData = await response.stream.bytesToString();
-          final jsonResult = json.decode(responseData);
+  final responseData = await response.stream.bytesToString();
+  final jsonResult = json.decode(responseData);
 
-          // Assuming the prediction is a list of probabilities
-          List<dynamic> predictions = jsonResult['prediction'][0];
-          String analysisResult =
-              'Normal: ${predictions[0].toStringAsFixed(2)}\n'
-              'Tuberculosis: ${predictions[1].toStringAsFixed(2)}';
+  String analysisResult;
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ResultsPage(
-                imagePath: _filePath!,
-                diseaseType: _diseaseType!,
-                analysisResult: analysisResult,
-              ),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error in analyzing image. Please try again.'),
-              backgroundColor: Color(0xFF3b82f6),
-            ),
-          );
-        }
+  // Try to handle both old and new response formats
+  try {
+    if (jsonResult.containsKey('study_info')) {
+      // New format
+      String classification = jsonResult['study_info']['classification'] ?? 'N/A';
+      String confidence = jsonResult['study_info']['confidence']?.toString() ?? 'N/A';
+      String confidenceStability = jsonResult['study_info']['confidence_stability']?.toString() ?? 'N/A';
+      String findings = jsonResult['findings'] ?? 'N/A';
+      String impression = jsonResult['impression'] ?? 'N/A';
+      List<String> recommendations = 
+          (jsonResult['recommendations'] as List<dynamic>?)?.cast<String>() ?? ['N/A'];
+
+      analysisResult = '''
+Classification: $classification
+Confidence: $confidence
+Stability: $confidenceStability
+Findings: $findings
+Impression: $impression
+Recommendations:
+- ${recommendations.join("\n- ")}
+''';
+    } else if (jsonResult.containsKey('prediction')) {
+      // Old format
+      List<dynamic> predictions = jsonResult['prediction'][0];
+      analysisResult = '''
+Normal: ${predictions[0].toStringAsFixed(2)}
+${_diseaseType}: ${predictions[1].toStringAsFixed(2)}
+''';
+    } else {
+      throw Exception('Unknown response format');
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultsPage(
+          imagePath: _filePath!,
+          diseaseType: _diseaseType!,
+          analysisResult: analysisResult,
+        ),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Error processing response data. Please try again.'),
+        backgroundColor: Color(0xFF3b82f6),
+      ),
+    );
+  }
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('Error in analyzing image. Please try again.'),
+      backgroundColor: Color(0xFF3b82f6),
+    ),
+  );
+}
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
