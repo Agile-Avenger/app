@@ -4,12 +4,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_frontend/pages/report_data.dart';
 import 'package:http/http.dart' as http;
 
 import 'results_page.dart';
 
 class UploadPage extends StatefulWidget {
-  const UploadPage({Key? key}) : super(key: key);
+  const UploadPage({super.key});
 
   @override
   _UploadPageState createState() => _UploadPageState();
@@ -36,7 +37,7 @@ class _UploadPageState extends State<UploadPage> {
         setState(() {
           _platformFile = result.files.first;
           _fileName = _platformFile!.name;
-          
+
           if (kIsWeb) {
             _filePath = _fileName;
           } else {
@@ -46,12 +47,7 @@ class _UploadPageState extends State<UploadPage> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error picking file: ${e.toString()}'),
-          backgroundColor: const Color(0xFF3b82f6),
-        ),
-      );
+      _showErrorSnackBar('Error picking file: ${e.toString()}');
     }
   }
 
@@ -76,7 +72,8 @@ class _UploadPageState extends State<UploadPage> {
           : 'https://flask-app-616464352400.us-central1.run.app/generate-tb-report';
 
       try {
-        http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(url));
+        http.MultipartRequest request =
+            http.MultipartRequest('POST', Uri.parse(url));
 
         if (kIsWeb) {
           request.files.add(
@@ -93,38 +90,194 @@ class _UploadPageState extends State<UploadPage> {
         }
 
         final response = await request.send();
-        
-        if (response.statusCode == 200) {
-          final responseData = await response.stream.bytesToString();
-          final jsonResult = json.decode(responseData);
+        final responseData = await response.stream.bytesToString();
 
-          if (jsonResult.containsKey('report')) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ResultsPage(
-                  imagePath: _filePath ?? _fileName!,
-                  diseaseType: _diseaseType!,
-                  analysisResult: jsonResult['report'],
-                ),
-              ),
-            );
+        if (response.statusCode == 200) {
+          final dynamic jsonResult = json.decode(responseData);
+          String formattedReport;
+
+          if (_scanType == 'X-ray') {
+            if (jsonResult is Map<String, dynamic> &&
+                jsonResult.containsKey('report')) {
+              formattedReport = _formatXrayReport(jsonResult['report']);
+              // Store X-ray report data globally
+              ReportData().setReportData(
+                imagePath: _filePath ?? _fileName!,
+                diseaseType: _diseaseType!,
+                analysisResult: formattedReport,
+                scanType: _scanType,
+                rawData: jsonResult['report'] is Map<String, dynamic>
+                    ? jsonResult['report'] as Map<String, dynamic>
+                    : {'report': jsonResult['report']},
+              );
+            } else {
+              formattedReport = jsonResult.toString();
+              // Store simple report format
+              ReportData().setReportData(
+                imagePath: _filePath ?? _fileName!,
+                diseaseType: _diseaseType!,
+                analysisResult: formattedReport,
+                scanType: _scanType,
+                rawData: {'report': jsonResult},
+              );
+            }
           } else {
-            _showErrorSnackBar('Invalid response format from server');
+            if (jsonResult is Map<String, dynamic> &&
+                jsonResult.containsKey('report')) {
+              formattedReport =
+                  _formatCTReport(jsonResult['report'] as Map<String, dynamic>);
+              // Store CT report data globally (already implemented)
+              ReportData().setReportData(
+                imagePath: _filePath ?? _fileName!,
+                diseaseType: _diseaseType!,
+                analysisResult: formattedReport,
+                scanType: _scanType,
+                rawData: jsonResult['report'] as Map<String, dynamic>,
+              );
+            } else {
+              _showErrorSnackBar('Invalid response format from server');
+              setState(() {
+                _isLoading = false;
+              });
+              return;
+            }
           }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultsPage(
+                imagePath: _filePath ?? _fileName!,
+                diseaseType: _diseaseType!,
+                analysisResult: formattedReport,
+              ),
+            ),
+          );
         } else {
-          _showErrorSnackBar('Error in analyzing image. Please try again.');
+          _showErrorSnackBar(
+              'Error in analyzing image. Status code: ${response.statusCode}');
         }
       } catch (e) {
-        _showErrorSnackBar('Failed to connect to the server: ${e.toString()}');
+        print('Error details: $e');
+        _showErrorSnackBar('Failed to analyze image: ${e.toString()}');
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
     } else {
-      _showErrorSnackBar('Please select an image, scan type, and disease category.');
+      _showErrorSnackBar(
+          'Please select an image, scan type, and disease category.');
     }
+  }
+
+  String _formatXrayReport(dynamic report) {
+    try {
+      if (report is String) {
+        return report;
+      } else if (report is Map<String, dynamic>) {
+        StringBuffer buffer = StringBuffer();
+        buffer.writeln('X-RAY ANALYSIS REPORT\n');
+
+        // Add basic information if available
+        if (report.containsKey('prediction')) {
+          buffer.writeln('Prediction: ${report['prediction']}');
+        }
+        if (report.containsKey('confidence')) {
+          buffer.writeln(
+              'Confidence: ${(report['confidence'] * 100).toStringAsFixed(2)}%');
+        }
+        if (report.containsKey('diagnosis')) {
+          buffer.writeln('Diagnosis: ${report['diagnosis']}');
+        }
+
+        // Add any additional information
+        report.forEach((key, value) {
+          if (!['prediction', 'confidence', 'diagnosis'].contains(key)) {
+            if (value is Map) {
+              buffer.writeln('\n${key.toUpperCase()}:');
+              value.forEach((k, v) => buffer.writeln('$k: $v'));
+            } else if (value is List) {
+              buffer.writeln('\n${key.toUpperCase()}:');
+              for (var item in value) {
+                buffer.writeln('• $item');
+              }
+            } else {
+              buffer.writeln('${key.toUpperCase()}: $value');
+            }
+          }
+        });
+
+        return buffer.toString();
+      }
+      return 'Unable to format report: Invalid format';
+    } catch (e) {
+      return 'Error formatting report: $e';
+    }
+  }
+
+  String _formatCTReport(Map<String, dynamic> report) {
+    StringBuffer buffer = StringBuffer();
+
+    // Add patient info
+    if (report.containsKey('patient_info')) {
+      Map<String, dynamic> patientInfo =
+          report['patient_info'] as Map<String, dynamic>;
+      buffer.writeln('PATIENT INFORMATION');
+      buffer.writeln('Date: ${patientInfo['date']}');
+      buffer.writeln('');
+    }
+
+    // Add study info
+    if (report.containsKey('study')) {
+      Map<String, dynamic> study = report['study'] as Map<String, dynamic>;
+      buffer.writeln('STUDY DETAILS');
+      buffer.writeln('Type: ${study['type']}');
+      buffer.writeln('Image Quality: ${study['image_quality']}');
+      buffer.writeln('Reason: ${study['reason_for_examination']}');
+      buffer.writeln('');
+    }
+
+    // Add findings
+    if (report.containsKey('findings')) {
+      Map<String, dynamic> findings =
+          report['findings'] as Map<String, dynamic>;
+      buffer.writeln('FINDINGS');
+      findings.forEach((key, value) {
+        buffer.writeln('${key.replaceAll('_', ' ').toUpperCase()}: $value');
+      });
+      buffer.writeln('');
+    }
+
+    // Add impression
+    if (report.containsKey('impression')) {
+      buffer.writeln('IMPRESSION');
+      buffer.writeln(report['impression']);
+      buffer.writeln('');
+    }
+
+    // Add recommendations
+    if (report.containsKey('recommendations')) {
+      buffer.writeln('RECOMMENDATIONS');
+      List<dynamic> recommendations =
+          report['recommendations'] as List<dynamic>;
+      for (var recommendation in recommendations) {
+        buffer.writeln('• $recommendation');
+      }
+    }
+
+    // Add analysis metrics if available
+    if (report.containsKey('analysis_metrics')) {
+      buffer.writeln('\nANALYSIS METRICS');
+      Map<String, dynamic> metrics =
+          report['analysis_metrics'] as Map<String, dynamic>;
+      metrics.forEach((key, value) {
+        buffer.writeln(
+            '${key.replaceAll('_', ' ').toUpperCase()}: ${value is double ? value.toStringAsFixed(4) : value}');
+      });
+    }
+
+    return buffer.toString();
   }
 
   void _showErrorSnackBar(String message) {
@@ -318,7 +471,8 @@ class _UploadPageState extends State<UploadPage> {
                           ElevatedButton(
                             onPressed: _analyzeImage,
                             style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.all(isSmallScreen ? 16 : 20), backgroundColor: const Color(0xFF3b82f6),
+                              padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
+                              backgroundColor: const Color(0xFF3b82f6),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

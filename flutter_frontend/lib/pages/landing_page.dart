@@ -1,16 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_frontend/pages/login_screen.dart';
 import 'dart:math' show pi, sin;
 import 'home_page.dart';
 
 class LandingPage extends StatefulWidget {
-  const LandingPage({Key? key}) : super(key: key);
+  const LandingPage({super.key});
 
   @override
   State<LandingPage> createState() => _LandingPageState();
 }
 
-class _LandingPageState extends State<LandingPage> with SingleTickerProviderStateMixin {
+class _LandingPageState extends State<LandingPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isHovered = false;
 
@@ -39,7 +42,7 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
             animation: _controller,
             builder: (context, child) {
               return Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -52,8 +55,8 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
                 child: CustomPaint(
                   painter: BackgroundPainter(
                     animation: _controller,
-                    color1: Color(0xFF3b82f6).withOpacity(0.1),
-                    color2: Color(0xFF9333ea).withOpacity(0.1),
+                    color1: const Color(0xFF3b82f6).withOpacity(0.1),
+                    color2: const Color(0xFF9333ea).withOpacity(0.1),
                   ),
                   child: Container(),
                 ),
@@ -73,7 +76,7 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
                     child: Container(
                       height: 120,
                       width: 120,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
                           colors: [
@@ -83,28 +86,31 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
                         ),
                       ),
                       child: Padding(
-  padding: const EdgeInsets.all(20.0),
-  child: ClipOval(
-    child: Image.asset(
-      'assets/scanlogo.png',
-      width: 120, // Set the desired width
-      height: 120, // Set the desired height
-      fit: BoxFit.cover, // Ensures the image covers the circular area
-      ),
-  ),
-),
+                        padding: const EdgeInsets.all(20.0),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/scanlogo.png',
+                            width: 120, // Set the desired width
+                            height: 120, // Set the desired height
+                            fit: BoxFit
+                                .cover, // Ensures the image covers the circular area
+                          ),
+                        ),
+                      ),
                     ),
-                  ).animate().scale(duration: 800.ms, curve: Curves.easeOutBack),
-                  SizedBox(height: 40),
+                  )
+                      .animate()
+                      .scale(duration: 800.ms, curve: Curves.easeOutBack),
+                  const SizedBox(height: 40),
                   // Main title with gradient
                   ShaderMask(
-                    shaderCallback: (bounds) => LinearGradient(
+                    shaderCallback: (bounds) => const LinearGradient(
                       colors: [
                         Color(0xFF3b82f6),
                         Color(0xFF9333ea),
                       ],
                     ).createShader(bounds),
-                    child: Text(
+                    child: const Text(
                       'Transform Healthcare\nWith AI',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -115,9 +121,9 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
                       ),
                     ),
                   ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.3),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   // Subtitle
-                  Text(
+                  const Text(
                     'Experience the future of medical diagnostics with our advanced AI-powered image analysis platform.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -125,20 +131,23 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
                       color: Colors.white70,
                       height: 1.6,
                     ),
-                  ).animate().fadeIn(duration: 800.ms, delay: 200.ms).slideY(begin: 0.3),
-                  SizedBox(height: 60),
+                  )
+                      .animate()
+                      .fadeIn(duration: 800.ms, delay: 200.ms)
+                      .slideY(begin: 0.3),
+                  const SizedBox(height: 60),
                   // Stats row
                   _buildStatsRow(),
-                  SizedBox(height: 80),
+                  const SizedBox(height: 80),
                   // Features grid
                   _buildFeaturesGrid(),
-                  SizedBox(height: 80),
+                  const SizedBox(height: 80),
                   // Enter button
                   _buildEnterButton(context),
-                  SizedBox(height: 60),
+                  const SizedBox(height: 60),
                   // Trust indicators
                   _buildTrustIndicators(),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -153,7 +162,7 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildStatItem(
-          number: '99.9%',
+          number: '97.9%',
           label: 'Accuracy',
           delay: 0,
         ),
@@ -190,16 +199,16 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
       children: [
         Text(
           number,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             color: Colors.white70,
           ),
@@ -211,7 +220,7 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
   Widget _buildFeaturesGrid() {
     return GridView.count(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
       mainAxisSpacing: 20,
       crossAxisSpacing: 20,
@@ -252,7 +261,7 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
     required int delay,
   }) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(20),
@@ -263,61 +272,91 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Color(0xFF3b82f6), size: 32),
-          SizedBox(height: 12),
+          Icon(icon, color: const Color(0xFF3b82f6), size: 32),
+          const SizedBox(height: 12),
           Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: MediaQuery.of(context).size.width * 0.020, // Responsive font size
+              fontSize: MediaQuery.of(context).size.width *
+                  0.020, // Responsive font size
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             description,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: MediaQuery.of(context).size.width * 0.014, // Responsive font size
+              fontSize: MediaQuery.of(context).size.width *
+                  0.014, // Responsive font size
               color: Colors.white70,
             ),
           ),
         ],
       ),
-    ) .animate()
-  .fadeIn(duration: Duration(milliseconds: 800), delay: Duration(milliseconds: delay))
-  .scale(begin: Offset(0.8, 0.8)); // Use Offset for uniform scalingset
-}
+    )
+        .animate()
+        .fadeIn(
+            duration: const Duration(milliseconds: 800),
+            delay: Duration(milliseconds: delay))
+        .scale(
+            begin: const Offset(0.8, 0.8)); // Use Offset for uniform scalingset
+  }
 
   Widget _buildEnterButton(BuildContext context) {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
-        transform: Matrix4.identity()
-          ..scale(_isHovered ? 1.05 : 1.0),
+        duration: const Duration(milliseconds: 200),
+        transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
         child: GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-                transitionDuration: Duration(milliseconds: 800),
-              ),
-            );
+          onTap: () async {
+            // Check if the user is logged in
+            User? user = FirebaseAuth.instance.currentUser;
+
+            if (user != null) {
+              // User is logged in, navigate to HomePage
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const HomePage(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 800),
+                ),
+              );
+            } else {
+              // User is not logged in, navigate to LoginPage
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      LoginScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 800),
+                ),
+              );
+            }
           },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 48, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [
                   Color(0xFF3b82f6),
                   Color(0xFF9333ea),
@@ -326,13 +365,13 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
               borderRadius: BorderRadius.circular(40),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF3b82f6).withOpacity(0.3),
+                  color: const Color(0xFF3b82f6).withOpacity(0.3),
                   blurRadius: 30,
-                  offset: Offset(0, 10),
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
@@ -366,13 +405,13 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
           'Approved',
           delay: 0,
         ),
-        SizedBox(width: 40),
+        const SizedBox(width: 40),
         _buildTrustBadge(
           'CE',
           'Certified',
           delay: 100,
         ),
-        SizedBox(width: 40),
+        const SizedBox(width: 40),
         _buildTrustBadge(
           'ISO',
           '27001',
@@ -387,16 +426,16 @@ class _LandingPageState extends State<LandingPage> with SingleTickerProviderStat
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(
           subtitle,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             color: Colors.white70,
           ),
@@ -426,19 +465,19 @@ class BackgroundPainter extends CustomPainter {
     for (var i = 0; i < 5; i++) {
       final phase = animation.value * 2 * pi + i * pi / 2;
       paint.color = i.isEven ? color1 : color2;
-      
+
       path.reset();
       path.moveTo(0, size.height * 0.5);
-      
+
       for (var x = 0; x < size.width; x++) {
         final y = sin(x * 0.01 + phase) * 50 + size.height * 0.5;
         path.lineTo(x.toDouble(), y);
       }
-      
+
       path.lineTo(size.width, size.height);
       path.lineTo(0, size.height);
       path.close();
-      
+
       canvas.drawPath(path, paint);
     }
   }

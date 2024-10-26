@@ -1,8 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  Map<String, dynamic>? patientData;
+  bool isLoading = true;
+  bool hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPatientData();
+  }
+
+  Future<void> _fetchPatientData() async {
+    try {
+      // Retrieve the Firebase auth token
+      String? token = await FirebaseAuth.instance.currentUser?.getIdToken();
+
+      // Prepare the headers
+      Map<String, String> headers = {
+        'Authorization': 'Bearer $token', // Include the token in the headers
+        'Content-Type': 'application/json',
+      };
+
+      // Make the HTTP request with headers
+      final response = await http.get(
+        Uri.parse('https://flask-app-616464352400.us-central1.run.app/patient'),
+        headers: headers, // Pass the headers here
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          patientData = json.decode(response.body);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          hasError = true;
+          isLoading = false;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +66,7 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Container(
-          margin: EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
@@ -24,7 +78,7 @@ class ProfilePage extends StatelessWidget {
         ),
         actions: [
           Container(
-            margin: EdgeInsets.all(8),
+            margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
@@ -39,7 +93,7 @@ class ProfilePage extends StatelessWidget {
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -49,39 +103,47 @@ class ProfilePage extends StatelessWidget {
             ],
           ),
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: MediaQuery.of(context).padding.top + 20),
-              // Profile Header
-              _buildProfileHeader(),
-              SizedBox(height: 30),
-              // Quick Stats
-              _buildQuickStats(),
-              SizedBox(height: 30),
-              // Main Content
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    _buildSection(
-                      title: 'Personal Information',
-                      content: _buildPersonalInfo(),
+        child: isLoading
+            ? const Center(
+                child: CircularProgressIndicator()) // Loading spinner
+            : hasError
+                ? const Center(
+                    child: Text('Error fetching data',
+                        style: TextStyle(color: Colors.red)))
+                : SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                            height: MediaQuery.of(context).padding.top + 20),
+                        // Profile Header
+                        _buildProfileHeader(),
+                        const SizedBox(height: 30),
+                        // Quick Stats
+                        _buildQuickStats(),
+                        const SizedBox(height: 30),
+                        // Main Content
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              _buildSection(
+                                title: 'Personal Information',
+                                content: _buildPersonalInfo(),
+                              ),
+                              const SizedBox(height: 20),
+                              _buildSection(
+                                title: 'Medical Information',
+                                content: _buildMedicalInfo(),
+                              ),
+                              const SizedBox(height: 30),
+                              _buildLogoutButton(),
+                              const SizedBox(height: 30),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 20),
-                    _buildSection(
-                      title: 'Medical Information',
-                      content: _buildMedicalInfo(),
-                    ),
-                    SizedBox(height: 30),
-                    _buildLogoutButton(),
-                    SizedBox(height: 30),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+                  ),
       ),
     );
   }
@@ -90,51 +152,53 @@ class ProfilePage extends StatelessWidget {
     return Column(
       children: [
         Stack(
-  alignment: Alignment.center,
-  children: [
-    Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF3b82f6),
-            Color(0xFF9333ea),
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF3b82f6),
+                    Color(0xFF9333ea),
+                  ],
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(3),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF1a1a1a),
+                  ),
+                  child: const CircleAvatar(
+                    radius: 55,
+                    backgroundImage: AssetImage(
+                        'assets/user3.jpg'), // You can update this based on fetched data
+                  ),
+                ),
+              ),
+            ),
           ],
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(3),
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFF1a1a1a),
-          ),
-          child: CircleAvatar(
-            radius: 55,
-            backgroundImage: AssetImage('assets/user3.jpg'),
-          ),
-        ),
-      ),
-    ),
-  ],
-).animate()
-  .fadeIn(duration: 600.ms)
-  .scale(begin: Offset(0.8, 0.8)), // Corrected line
-        SizedBox(height: 20),
+        )
+            .animate()
+            .fadeIn(duration: 600.ms)
+            .scale(begin: const Offset(0.8, 0.8)),
+        const SizedBox(height: 20),
         Text(
-          'John Doe',
-          style: TextStyle(
+          patientData?['name'] ?? 'John Doe', // Update with fetched data
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ).animate().fadeIn(duration: 600.ms, delay: 200.ms),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          'Patient ID: #12345',
-          style: TextStyle(
+          'Patient ID: ${patientData?['id'] ?? '#12345'}', // Update with fetched data
+          style: const TextStyle(
             fontSize: 16,
             color: Colors.white70,
           ),
@@ -154,14 +218,14 @@ class ProfilePage extends StatelessWidget {
             subtitle: 'Age',
             delay: 400,
           ),
-          SizedBox(width: 15),
+          const SizedBox(width: 15),
           _buildStatCard(
             icon: Icons.assessment,
             title: '3',
             subtitle: 'Reports',
             delay: 500,
           ),
-          SizedBox(width: 15),
+          const SizedBox(width: 15),
           _buildStatCard(
             icon: Icons.medical_services,
             title: '2',
@@ -181,7 +245,7 @@ class ProfilePage extends StatelessWidget {
   }) {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.all(15),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
@@ -189,20 +253,20 @@ class ProfilePage extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, color: Color(0xFF3b82f6), size: 24),
-            SizedBox(height: 8),
+            Icon(icon, color: const Color(0xFF3b82f6), size: 24),
+            const SizedBox(height: 8),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               subtitle,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white70,
               ),
@@ -224,10 +288,10 @@ class ProfilePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -243,25 +307,25 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildPersonalInfo() {
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           _buildInfoRow(
             icon: Icons.person,
             label: 'Gender',
-            value: 'Male',
+            value: patientData?['gender'] ?? 'N/A',
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.email,
             label: 'Email',
-            value: 'john.doe@example.com',
+            value: patientData?['email'] ?? 'N/A',
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.phone,
             label: 'Phone',
-            value: '+1 (555) 123-4567',
+            value: patientData?['phone'] ?? 'N/A',
           ),
         ],
       ),
@@ -270,25 +334,25 @@ class ProfilePage extends StatelessWidget {
 
   Widget _buildMedicalInfo() {
     return Padding(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           _buildInfoRow(
             icon: Icons.medical_services,
             label: 'Medical History',
-            value: 'Diabetes',
+            value: patientData?['medicalHistory'] ?? 'N/A',
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.person_outline,
             label: 'Physician',
-            value: 'Dr. Smith',
+            value: patientData?['physician'] ?? 'N/A',
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           _buildInfoRow(
             icon: Icons.calendar_today,
             label: 'Last Visit',
-            value: '2024-10-26',
+            value: patientData?['lastVisit'] ?? 'N/A',
           ),
         ],
       ),
@@ -303,28 +367,28 @@ class ProfilePage extends StatelessWidget {
     return Row(
       children: [
         Container(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Color(0xFF3b82f6).withOpacity(0.1),
+            color: const Color(0xFF3b82f6).withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: Color(0xFF3b82f6), size: 20),
+          child: Icon(icon, color: const Color(0xFF3b82f6), size: 20),
         ),
-        SizedBox(width: 15),
+        const SizedBox(width: 15),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white70,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
@@ -337,7 +401,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildLogoutButton() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
@@ -347,7 +411,7 @@ class ProfilePage extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [
                   Color(0xFF3b82f6),
                   Color(0xFF9333ea),
@@ -356,14 +420,14 @@ class ProfilePage extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF3b82f6).withOpacity(0.3),
+                  color: const Color(0xFF3b82f6).withOpacity(0.3),
                   blurRadius: 20,
-                  offset: Offset(0, 8),
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Row(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.logout, color: Colors.white, size: 20),

@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import './login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
   @override
   _SignupScreenState createState() => _SignupScreenState();
 }
@@ -49,51 +51,52 @@ class _SignupScreenState extends State<SignupScreen> {
                       MainAxisSize.min, // Use min size for card height
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Get Started Now',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold, // Smaller font size
                       ),
                     ),
-                    SizedBox(height: 16), // Adjust spacing
+                    const SizedBox(height: 16), // Adjust spacing
                     TextField(
                       controller: _nameController,
-                      decoration: InputDecoration(labelText: 'Name'),
+                      decoration: const InputDecoration(labelText: 'Name'),
                     ),
-                    SizedBox(height: 16), // Adjust spacing
+                    const SizedBox(height: 16), // Adjust spacing
                     TextField(
                       controller: _emailController,
-                      decoration: InputDecoration(labelText: 'Email Address'),
+                      decoration:
+                          const InputDecoration(labelText: 'Email Address'),
                     ),
-                    SizedBox(height: 16), // Adjust spacing
+                    const SizedBox(height: 16), // Adjust spacing
                     TextField(
                       controller: _passwordController,
-                      decoration: InputDecoration(labelText: 'Password'),
+                      decoration: const InputDecoration(labelText: 'Password'),
                       obscureText: true,
                     ),
-                    SizedBox(height: 16), // Adjust spacing
+                    const SizedBox(height: 16), // Adjust spacing
                     ElevatedButton(
                       onPressed: _register, // Link to register function
-                      child: Text('Sign Up'),
+                      child: const Text('Sign Up'),
                     ),
-                    SizedBox(height: 16), // Adjust spacing
+                    const SizedBox(height: 16), // Adjust spacing
                     ElevatedButton.icon(
                       onPressed: () {
                         // Add Google Sign-In functionality here
                       },
-                      icon:
-                          FaIcon(FontAwesomeIcons.google, color: Colors.white),
-                      label: Text('Sign up with Google'),
+                      icon: const FaIcon(FontAwesomeIcons.google,
+                          color: Colors.white),
+                      label: const Text('Sign up with Google'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                       ),
                     ),
-                    SizedBox(height: 16), // Adjust spacing
+                    const SizedBox(height: 16), // Adjust spacing
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Already have an account? '),
+                        const Text('Already have an account? '),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -103,7 +106,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       LoginScreen()), // Navigate to LoginScreen
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             'Sign in',
                             style: TextStyle(color: Colors.blue),
                           ),

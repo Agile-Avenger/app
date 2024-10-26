@@ -4,7 +4,7 @@ import 'upload_page.dart';
 import 'profile_page.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,8 @@ class HomePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ProfilePage()),
+                    MaterialPageRoute(
+                        builder: (context) => const ProfilePage()),
                   );
                 },
               ),
@@ -41,7 +42,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -64,8 +65,8 @@ class HomePage extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF3b82f6).withOpacity(0.1),
-                      Color(0xFF9333ea).withOpacity(0.1),
+                      const Color(0xFF3b82f6).withOpacity(0.1),
+                      const Color(0xFF9333ea).withOpacity(0.1),
                     ],
                   ),
                 ),
@@ -81,8 +82,8 @@ class HomePage extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF9333ea).withOpacity(0.1),
-                      Color(0xFF3b82f6).withOpacity(0.1),
+                      const Color(0xFF9333ea).withOpacity(0.1),
+                      const Color(0xFF3b82f6).withOpacity(0.1),
                     ],
                   ),
                 ),
@@ -101,11 +102,11 @@ class HomePage extends StatelessWidget {
                       children: [
                         _buildStatCard(
                           icon: Icons.analytics,
-                          title: '99.9%',
+                          title: '97.9%',
                           subtitle: 'Accuracy',
                           delay: 0,
                         ),
-                        SizedBox(width: 16),
+                        const SizedBox(width: 16),
                         _buildStatCard(
                           icon: Icons.speed,
                           title: '<2s',
@@ -114,16 +115,16 @@ class HomePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     // Main title
                     ShaderMask(
-                      shaderCallback: (bounds) => LinearGradient(
+                      shaderCallback: (bounds) => const LinearGradient(
                         colors: [
                           Color(0xFF3b82f6),
                           Color(0xFF9333ea),
                         ],
                       ).createShader(bounds),
-                      child: Text(
+                      child: const Text(
                         'AI-Powered\nMedical Image\nAnalysis',
                         style: TextStyle(
                           fontSize: 48.0,
@@ -132,18 +133,24 @@ class HomePage extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-                    ).animate().fadeIn(duration: 600.ms).slideX(begin: -0.2, duration: 600.ms),
-                    SizedBox(height: 24),
+                    )
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .slideX(begin: -0.2, duration: 600.ms),
+                    const SizedBox(height: 24),
                     // Description
-                    Text(
+                    const Text(
                       'Leverage cutting-edge artificial intelligence to analyze medical images and detect potential health conditions with unprecedented accuracy and speed.',
                       style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.white70,
                         height: 1.6,
                       ),
-                    ).animate().fadeIn(duration: 600.ms, delay: 200.ms).slideX(begin: -0.2, duration: 600.ms),
-                    SizedBox(height: 40),
+                    )
+                        .animate()
+                        .fadeIn(duration: 600.ms, delay: 200.ms)
+                        .slideX(begin: -0.2, duration: 600.ms),
+                    const SizedBox(height: 40),
                     // Features list
                     _buildFeatureItem(
                       icon: Icons.security,
@@ -160,7 +167,7 @@ class HomePage extends StatelessWidget {
                       title: '24/7 Support',
                       delay: 500,
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                     // Get Started button
                     Center(
                       child: _buildGradientButton(
@@ -168,12 +175,13 @@ class HomePage extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => UploadPage()),
+                            MaterialPageRoute(
+                                builder: (context) => const UploadPage()),
                           );
                         },
                       ),
                     ),
-                    SizedBox(height: 40),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -192,7 +200,7 @@ class HomePage extends StatelessWidget {
   }) {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
@@ -204,19 +212,19 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: Colors.white70, size: 24),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               subtitle,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white70,
               ),
@@ -224,7 +232,10 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms, delay: delay.ms).slideY(begin: 0.2, duration: 600.ms);
+    )
+        .animate()
+        .fadeIn(duration: 600.ms, delay: delay.ms)
+        .slideY(begin: 0.2, duration: 600.ms);
   }
 
   Widget _buildFeatureItem({
@@ -235,7 +246,7 @@ class HomePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
@@ -245,11 +256,11 @@ class HomePage extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: Color(0xFF3b82f6), size: 24),
-            SizedBox(width: 16),
+            Icon(icon, color: const Color(0xFF3b82f6), size: 24),
+            const SizedBox(width: 16),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
@@ -258,7 +269,10 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms, delay: delay.ms).slideX(begin: -0.2, duration: 600.ms);
+    )
+        .animate()
+        .fadeIn(duration: 600.ms, delay: delay.ms)
+        .slideX(begin: -0.2, duration: 600.ms);
   }
 
   Widget _buildGradientButton({
@@ -271,7 +285,7 @@ class HomePage extends StatelessWidget {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [
                 Color(0xFF3b82f6),
                 Color(0xFF9333ea),
@@ -280,17 +294,17 @@ class HomePage extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF3b82f6).withOpacity(0.3),
+                color: const Color(0xFF3b82f6).withOpacity(0.3),
                 blurRadius: 20,
-                offset: Offset(0, 8),
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: 40,
             vertical: 20,
           ),
-          child: Row(
+          child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
@@ -311,5 +325,9 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms, delay: 600.ms).slideY(begin: 0.2, duration: 600.ms);
-  }}
+    )
+        .animate()
+        .fadeIn(duration: 600.ms, delay: 600.ms)
+        .slideY(begin: 0.2, duration: 600.ms);
+  }
+}
