@@ -47,7 +47,7 @@ class ResultsPage extends StatelessWidget {
                       const SizedBox(height: 24),
                       _buildAnalysisContainer(isSmallScreen, screenSize.width * 0.9),
                       const SizedBox(height: 24),
-                      _buildButtons(isSmallScreen, screenSize.width * 0.9),
+                      _buildButtons(isSmallScreen, screenSize.width * 0.9, context),
                     ],
                   );
                 } else {
@@ -67,7 +67,7 @@ class ResultsPage extends StatelessWidget {
                           const SizedBox(height: 24),
                           _buildAnalysisContainer(isSmallScreen, screenSize.width * 0.4),
                           const SizedBox(height: 24),
-                          _buildButtons(isSmallScreen, screenSize.width * 0.4),
+                          _buildButtons(isSmallScreen, screenSize.width * 0.4, context),
                         ],
                       ),
                     ],
@@ -223,7 +223,7 @@ class ResultsPage extends StatelessWidget {
         .slideY(begin: 0.2, duration: 600.ms);
   }
 
-  Widget _buildButtons(bool isSmallScreen, double maxWidth) {
+  Widget _buildButtons(bool isSmallScreen, double maxWidth, BuildContext context) {
     return Container(
       constraints: BoxConstraints(
         maxWidth: maxWidth,
@@ -236,7 +236,7 @@ class ResultsPage extends StatelessWidget {
           GestureDetector(
             onTap: () {
               Navigator.pushAndRemoveUntil(
-                context!,
+                context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
                 (route) => false,
               );
@@ -261,7 +261,7 @@ class ResultsPage extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => Navigator.pop(context!),
+            onTap: () => Navigator.pop(context),
             child: Container(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
