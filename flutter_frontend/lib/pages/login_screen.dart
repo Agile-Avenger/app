@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'signup_screen.dart';
-import 'patient_form.dart'; // Import the PatientForm
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -24,16 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
       print('Logged in as: ${userCredential.user?.email}');
-      // Navigate to PatientForm after successful login
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PatientForm(
-            email: userCredential.user?.email ?? '',
-            name: userCredential.user?.displayName ?? '',
-          ),
-        ),
-      );
     } catch (e) {
       print('Error: $e');
     }
@@ -58,16 +47,6 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         await _auth.signInWithCredential(credential);
         print('Logged in with Google: ${_auth.currentUser?.email}');
-        // Navigate to PatientForm after successful login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PatientForm(
-              email: googleUser.email,
-              name: googleUser.displayName ?? '',
-            ),
-          ),
-        );
       }
     } catch (e) {
       print('Google Sign-In error: $e');
