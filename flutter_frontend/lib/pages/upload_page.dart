@@ -29,7 +29,7 @@ class _UploadPageState extends State<UploadPage> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png'],
-        withData: kIsWeb, // Only load file data in web
+        withData: kIsWeb,
       );
 
       if (result != null) {
@@ -72,14 +72,13 @@ class _UploadPageState extends State<UploadPage> {
       });
 
       String url = _scanType == 'X-ray' && _diseaseType == 'Pneumonia'
-          ? 'https://flask-app-616464352400.us-central1.run.app/predict_pneumonia'
-          : 'https://flask-app-616464352400.us-central1.run.app/predict_tb';
+          ? 'https://flask-app-616464352400.us-central1.run.app/generate-pneumonia-report'
+          : 'https://flask-app-616464352400.us-central1.run.app/generate-tb-report';
 
       try {
         http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(url));
 
         if (kIsWeb) {
-          // Handle web file upload using bytes
           request.files.add(
             http.MultipartFile.fromBytes(
               'file',
@@ -88,7 +87,6 @@ class _UploadPageState extends State<UploadPage> {
             ),
           );
         } else {
-          // Handle desktop/mobile file upload using path
           request.files.add(
             await http.MultipartFile.fromPath('file', _filePath!),
           );
@@ -100,51 +98,19 @@ class _UploadPageState extends State<UploadPage> {
           final responseData = await response.stream.bytesToString();
           final jsonResult = json.decode(responseData);
 
-          String analysisResult;
-
-          try {
-            if (jsonResult.containsKey('study_info')) {
-              // New format handling
-              String classification = jsonResult['study_info']['classification'] ?? 'N/A';
-              String confidence = jsonResult['study_info']['confidence']?.toString() ?? 'N/A';
-              String confidenceStability = jsonResult['study_info']['confidence_stability']?.toString() ?? 'N/A';
-              String findings = jsonResult['findings'] ?? 'N/A';
-              String impression = jsonResult['impression'] ?? 'N/A';
-              List<String> recommendations =
-                  (jsonResult['recommendations'] as List<dynamic>?)?.cast<String>() ?? ['N/A'];
-
-              analysisResult = '''
-Classification: $classification
-Confidence: $confidence
-Stability: $confidenceStability
-Findings: $findings
-Impression: $impression
-Recommendations:
-- ${recommendations.join("\n- ")}
-''';
-            } else if (jsonResult.containsKey('prediction')) {
-              // Old format handling
-              List<dynamic> predictions = jsonResult['prediction'][0];
-              analysisResult = '''
-Normal: ${predictions[0].toStringAsFixed(2)}
-${_diseaseType}: ${predictions[1].toStringAsFixed(2)}
-''';
-            } else {
-              throw Exception('Unknown response format');
-            }
-
+          if (jsonResult.containsKey('report')) {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ResultsPage(
                   imagePath: _filePath ?? _fileName!,
                   diseaseType: _diseaseType!,
-                  analysisResult: analysisResult,
+                  analysisResult: jsonResult['report'],
                 ),
               ),
             );
-          } catch (e) {
-            _showErrorSnackBar('Error processing response data. Please try again.');
+          } else {
+            _showErrorSnackBar('Invalid response format from server');
           }
         } else {
           _showErrorSnackBar('Error in analyzing image. Please try again.');
