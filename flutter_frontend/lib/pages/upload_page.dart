@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:io';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -19,77 +20,91 @@ class _UploadPageState extends State<UploadPage> {
   String? _scanType;
   String? _diseaseType;
   File? _imageFile;
+  PlatformFile? _platformFile;
   bool _isLoading = false;
+  String? _fileName;
 
   Future<void> _pickFile() async {
-    String? selectedFilePath =
-        await FilePicker.platform.pickFiles().then((result) {
-      return result?.files.single.path;
-    });
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png'],
+        withData: kIsWeb, // Only load file data in web
+      );
 
-    if (selectedFilePath != null) {
-      setState(() {
-        _filePath = selectedFilePath;
-        _imageFile = File(selectedFilePath);
-      });
+      if (result != null) {
+        setState(() {
+          _platformFile = result.files.first;
+          _fileName = _platformFile!.name;
+          
+          if (kIsWeb) {
+            _filePath = _fileName;
+          } else {
+            _filePath = _platformFile!.path;
+            _imageFile = File(_filePath!);
+          }
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error picking file: ${e.toString()}'),
+          backgroundColor: const Color(0xFF3b82f6),
+        ),
+      );
     }
   }
 
   void _analyzeImage() async {
     if (_scanType == 'CT scan') {
       setState(() {
-        _diseaseType = 'Tuberculosis'; // Automatically set disease type
+        _diseaseType = 'Tuberculosis';
       });
     } else if (_scanType == 'X-ray') {
       setState(() {
-        _diseaseType = 'Pneumonia'; // Automatically set disease type
+        _diseaseType = 'Pneumonia';
       });
     }
 
-    if (_filePath != null && _scanType != null && _diseaseType != null) {
+    if (_platformFile != null && _scanType != null && _diseaseType != null) {
       setState(() {
         _isLoading = true;
       });
 
-      // Define the URL based on scan and disease types
-      String url;
-      if (_scanType == 'X-ray' && _diseaseType == 'Pneumonia') {
-        url =
-            'https://flask-app-616464352400.us-central1.run.app/predict_pneumonia';
-      } else if (_scanType == 'CT scan' && _diseaseType == 'Tuberculosis') {
-        url = 'https://flask-app-616464352400.us-central1.run.app/predict_tb';
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unsupported scan and disease type combination.'),
-            backgroundColor: Color(0xFF3b82f6),
-          ),
-        );
-        return;
-      }
+      String url = _scanType == 'X-ray' && _diseaseType == 'Pneumonia'
+          ? 'https://flask-app-616464352400.us-central1.run.app/predict_pneumonia'
+          : 'https://flask-app-616464352400.us-central1.run.app/predict_tb';
 
       try {
-        // Prepare the request
-        final request = http.MultipartRequest('POST', Uri.parse(url));
-        request.files
-            .add(await http.MultipartFile.fromPath('file', _filePath!));
+        http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(url));
 
-        // Send the request
+        if (kIsWeb) {
+          // Handle web file upload using bytes
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'file',
+              _platformFile!.bytes!,
+              filename: _fileName,
+            ),
+          );
+        } else {
+          // Handle desktop/mobile file upload using path
+          request.files.add(
+            await http.MultipartFile.fromPath('file', _filePath!),
+          );
+        }
+
         final response = await request.send();
-
+        
         if (response.statusCode == 200) {
           final responseData = await response.stream.bytesToString();
           final jsonResult = json.decode(responseData);
 
           String analysisResult;
 
-          // Try to handle both old and new response formats
           try {
             if (jsonResult.containsKey('study_info')) {
-              // New format
+              // New format handling
               String classification = jsonResult['study_info']['classification'] ?? 'N/A';
               String confidence = jsonResult['study_info']['confidence']?.toString() ?? 'N/A';
               String confidenceStability = jsonResult['study_info']['confidence_stability']?.toString() ?? 'N/A';
@@ -108,7 +123,7 @@ Recommendations:
 - ${recommendations.join("\n- ")}
 ''';
             } else if (jsonResult.containsKey('prediction')) {
-              // Old format
+              // Old format handling
               List<dynamic> predictions = jsonResult['prediction'][0];
               analysisResult = '''
 Normal: ${predictions[0].toStringAsFixed(2)}
@@ -122,47 +137,37 @@ ${_diseaseType}: ${predictions[1].toStringAsFixed(2)}
               context,
               MaterialPageRoute(
                 builder: (context) => ResultsPage(
-                  imagePath: _filePath!,
+                  imagePath: _filePath ?? _fileName!,
                   diseaseType: _diseaseType!,
                   analysisResult: analysisResult,
                 ),
               ),
             );
           } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Error processing response data. Please try again.'),
-                backgroundColor: Color(0xFF3b82f6),
-              ),
-            );
+            _showErrorSnackBar('Error processing response data. Please try again.');
           }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error in analyzing image. Please try again.'),
-              backgroundColor: Color(0xFF3b82f6),
-            ),
-          );
+          _showErrorSnackBar('Error in analyzing image. Please try again.');
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to connect to the server.'),
-            backgroundColor: Color(0xFF3b82f6),
-          ),
-        );
+        _showErrorSnackBar('Failed to connect to the server: ${e.toString()}');
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content:
-            Text('Please select an image, scan type, and disease category.'),
-        backgroundColor: Color(0xFF3b82f6),
-      ));
+      _showErrorSnackBar('Please select an image, scan type, and disease category.');
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFF3b82f6),
+      ),
+    );
   }
 
   List<String> getDiseaseOptions() {
