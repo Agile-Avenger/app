@@ -101,7 +101,7 @@ class HomePage extends StatelessWidget {
                       children: [
                         _buildStatCard(
                           icon: Icons.analytics,
-                          title: '99.9%',
+                          title: '97.9%',
                           subtitle: 'Accuracy',
                           delay: 0,
                         ),

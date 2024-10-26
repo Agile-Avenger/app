@@ -164,7 +164,7 @@ class _LandingPageState extends State<LandingPage>
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildStatItem(
-          number: '99.9%',
+          number: '97.9%',
           label: 'Accuracy',
           delay: 0,
         ),
