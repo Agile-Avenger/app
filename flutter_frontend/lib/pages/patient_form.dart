@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart'; // Import for date formatting
 
 class PatientForm extends StatefulWidget {
-  final String email; // Add email parameter
-  final String name; // Add name parameter
+  final String userEmail;
+  final String userName;
 
-  PatientForm({required this.email, required this.name});
+  // Constructor to accept the user's email and name
+  PatientForm({required this.userEmail, required this.userName});
 
   @override
   _PatientFormState createState() => _PatientFormState();
@@ -15,146 +14,162 @@ class PatientForm extends StatefulWidget {
 
 class _PatientFormState extends State<PatientForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _numberController = TextEditingController();
-  final TextEditingController _medicalHistoryController =
-      TextEditingController();
-  final TextEditingController _physicianController = TextEditingController();
-  DateTime lastVisit = DateTime.now();
+  late String name;
+  late String email;
+  int age = 0;
   String gender = 'Male';
+  String number = '';
+  String medicalHistory = '';
+  String physician = '';
+  DateTime lastVisit = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    // Pre-fill name and email fields
-    _nameController.text = widget.name;
-    _emailController.text = widget.email;
-  }
-
-  Future<void> _savePatientData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('patients')
-            .doc(user.uid)
-            .set({
-          'name': _nameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'age': int.tryParse(_ageController.text) ?? 0,
-          'gender': gender,
-          'number': _numberController.text.trim(),
-          'medicalHistory': _medicalHistoryController.text.trim(),
-          'physician': _physicianController.text.trim(),
-          'lastVisit': lastVisit,
-        });
-        print('Patient data saved successfully!');
-        _showSnackbar('Patient data saved successfully!');
-        _clearForm();
-      } catch (e) {
-        print('Error saving patient data: $e');
-        _showSnackbar('Error saving patient data: $e');
-      }
-    } else {
-      _showSnackbar('No user is currently logged in.');
-    }
-  }
-
-  void _clearForm() {
-    _nameController.clear();
-    _emailController.clear();
-    _ageController.clear();
-    _numberController.clear();
-    _medicalHistoryController.clear();
-    _physicianController.clear();
-    setState(() {
-      gender = 'Male';
-      lastVisit = DateTime.now();
-    });
-  }
-
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    name = widget.userName; // Set default name from login
+    email = widget.userEmail; // Set default email from login
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
-              validator: (value) => value == null || value.isEmpty
-                  ? 'Please enter your name'
-                  : null,
-            ),
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-              validator: (value) => value == null ||
+    return Scaffold(
+      appBar: AppBar(title: const Text('Patient Form')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                initialValue: name,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  name = value;
+                },
+              ),
+              TextFormField(
+                initialValue: email,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (value == null ||
                       value.isEmpty ||
-                      !RegExp(r'\S+@\S+\.\S+').hasMatch(value)
-                  ? 'Please enter a valid email'
-                  : null,
-            ),
-            TextFormField(
-              controller: _ageController,
-              decoration: InputDecoration(labelText: 'Age'),
-              keyboardType: TextInputType.number,
-              validator: (value) => value == null || value.isEmpty
-                  ? 'Please enter your age'
-                  : null,
-            ),
-            DropdownButtonFormField<String>(
-              value: gender,
-              decoration: InputDecoration(labelText: 'Gender'),
-              items: ['Male', 'Female', 'Other']
-                  .map<DropdownMenuItem<String>>((value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  gender = value!;
-                });
-              },
-            ),
-            TextFormField(
-              controller: _numberController,
-              decoration: InputDecoration(labelText: 'Contact Number'),
-              keyboardType: TextInputType.phone,
-              validator: (value) => value == null || value.isEmpty
-                  ? 'Please enter your contact number'
-                  : null,
-            ),
-            TextFormField(
-              controller: _medicalHistoryController,
-              decoration: InputDecoration(labelText: 'Medical History'),
-              maxLines: 3,
-            ),
-            TextFormField(
-              controller: _physicianController,
-              decoration: InputDecoration(labelText: 'Physician Name'),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _savePatientData();
-                }
-              },
-              child: Text('Save Patient Data'),
-            ),
-          ],
+                      !RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  email = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Age'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your age';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  age = int.tryParse(value) ?? 0;
+                },
+              ),
+              DropdownButtonFormField<String>(
+                value: gender,
+                decoration: const InputDecoration(labelText: 'Gender'),
+                items: <String>['Male', 'Female', 'Other']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    gender = value!;
+                  });
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Contact Number'),
+                keyboardType: TextInputType.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your contact number';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  number = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Medical History'),
+                maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your medical history';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  medicalHistory = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Physician'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your physician\'s name';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  physician = value;
+                },
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Last Visit Date'),
+                readOnly: true,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: lastVisit,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null && pickedDate != lastVisit) {
+                    setState(() {
+                      lastVisit = pickedDate;
+                    });
+                  }
+                },
+                controller: TextEditingController(
+                  text: DateFormat('yyyy-MM-dd').format(lastVisit),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    // Process data (e.g., save to database)
+                    print(
+                        'Name: $name, Email: $email, Age: $age, Gender: $gender, '
+                        'Number: $number, Medical History: $medicalHistory, Physician: $physician, '
+                        'Last Visit: ${DateFormat('yyyy-MM-dd').format(lastVisit)}');
+                  }
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
         ),
       ),
     );
