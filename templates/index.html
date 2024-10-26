@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Medical Diagnosis</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .glass-effect {
+            background: rgba(17, 25, 40, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .gradient-border {
+            border: double 1px transparent;
+            background-image: linear-gradient(#1f2937, #1f2937), 
+                            linear-gradient(to right, #3b82f6, #8b5cf6);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Home Page -->
+    <div id="homePage" class="container mx-auto px-4">
+        <nav class="flex justify-between items-center py-6">
+            <div class="text-2xl font-bold gradient-text">MediVision AI</div>
+            <div class="space-x-4">
+                <button onclick="showPage('homePage')" class="text-gray-300 hover:text-white">Home</button>
+                <button onclick="showPage('uploadPage')" class="text-gray-300 hover:text-white">Diagnose</button>
+            </div>
+        </nav>
+
+        <div class="flex flex-col items-center justify-center min-h-[80vh] text-center">
+            <div class="glass-effect rounded-2xl p-8 max-w-2xl animate-float">
+                <h1 class="text-5xl font-bold mb-6 gradient-text">
+                    AI-Powered Medical Image Analysis
+                </h1>
+                <p class="text-gray-300 text-lg mb-8">
+                    Leverage cutting-edge artificial intelligence to analyze medical images and detect potential health conditions. Our system provides rapid, accurate insights to support medical professionals.
+                </p>
+                <button onclick="showPage('uploadPage')" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transform hover:scale-105 transition duration-200">
+                    Get Started
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Page -->
+    <div id="uploadPage" class="container mx-auto px-4 hidden">
+        <nav class="flex justify-between items-center py-6">
+            <div class="text-2xl font-bold gradient-text">MediVision AI</div>
+            <div class="space-x-4">
+                <button onclick="showPage('homePage')" class="text-gray-300 hover:text-white">Home</button>
+                <button onclick="showPage('uploadPage')" class="text-gray-300 hover:text-white">Diagnose</button>
+            </div>
+        </nav>
+
+        <div class="flex justify-center items-center min-h-[80vh]">
+            <div class="glass-effect rounded-2xl p-8 w-full max-w-xl">
+                <h2 class="text-3xl font-bold mb-6 gradient-text text-center">
+                    Upload Medical Image
+                </h2>
+                
+                <form id="uploadForm" class="space-y-6">
+                    <div class="gradient-border rounded-xl p-6 text-center cursor-pointer" id="dropZone">
+                        <input type="file" id="fileInput" class="hidden" accept="image/*">
+                        <div class="text-gray-400">
+                            <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <p class="text-lg">Drag and drop your image here or <span class="text-blue-400">browse</span></p>
+                            <p class="text-sm mt-2">Supported formats: PNG, JPG, JPEG</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <select id="diseaseType" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500">
+                            <option value="" disabled selected>Select Disease Category</option>
+                            <option value="pneumonia">Pneumonia</option>
+                            <option value="tuberculosis">Tuberculosis</option>
+                            <option value="covid19">COVID-19</option>
+                            <option value="brain_tumor">Brain Tumor</option>
+                            <option value="skin_cancer">Skin Cancer</option>
+                            <option value="diabetes_retinopathy">Diabetic Retinopathy</option>
+                            <option value="breast_cancer">Breast Cancer</option>
+                        </select>
+
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-8 rounded-lg hover:opacity-90 transform hover:scale-105 transition duration-200">
+                            Analyze Image
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Page -->
+    <div id="resultsPage" class="container mx-auto px-4 hidden">
+        <nav class="flex justify-between items-center py-6">
+            <div class="text-2xl font-bold gradient-text">MediVision AI</div>
+            <div class="space-x-4">
+                <button onclick="showPage('homePage')" class="text-gray-300 hover:text-white">Home</button>
+                <button onclick="showPage('uploadPage')" class="text-gray-300 hover:text-white">Diagnose</button>
+            </div>
+        </nav>
+
+        <div class="flex justify-center items-center min-h-[80vh]">
+            <div class="glass-effect rounded-2xl p-8 w-full max-w-4xl">
+                <h2 class="text-3xl font-bold mb-6 gradient-text text-center">Analysis Results</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="gradient-border rounded-xl p-4">
+                        <h3 class="text-xl font-semibold mb-4">Uploaded Image</h3>
+                        <img id="resultImage" class="w-full rounded-lg" src="/api/placeholder/400/300" alt="Uploaded medical image">
+                    </div>
+                    
+                    <div class="gradient-border rounded-xl p-4">
+                        <h3 class="text-xl font-semibold mb-4">Diagnosis</h3>
+                        <div id="diagnosisResult" class="text-gray-300">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <button onclick="showPage('uploadPage')" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 px-8 rounded-full hover:opacity-90 transform hover:scale-105 transition duration-200">
+                        Analyze Another Image
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            ['homePage', 'uploadPage', 'resultsPage'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // File upload handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        let selectedFile = null;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-blue-500');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500');
+            
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                selectedFile = file;
+                dropZone.innerHTML = `
+                    <p class="text-green-400">✓ ${file.name} selected</p>
+                    <p class="text-sm text-gray-400 mt-2">Click to change file</p>
+                `;
+            }
+        }
+
+        // Form submission
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedFile || !document.getElementById('diseaseType').value) {
+                alert('Please select both an image and a disease category');
+                return;
+            }
+
+            // Here you would normally send the data to your Flask backend
+            // For demo purposes, we'll just show the results page
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('resultImage').src = e.target.result;
+            }
+            reader.readAsDataURL(selectedFile);
+
+            document.getElementById('diagnosisResult').innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <p class="font-semibold text-green-400">Primary Diagnosis</p>
+                        <p class="mt-2">High likelihood of condition detected</p>
+                    </div>
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <p class="font-semibold text-blue-400">Confidence Score</p>
+                        <p class="mt-2">92.7%</p>
+                    </div>
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <p class="font-semibold text-purple-400">Additional Notes</p>
+                        <p class="mt-2">Recommended for clinical correlation and further evaluation</p>
+                    </div>
+                </div>
+            `;
+
+            showPage('resultsPage');
+        });
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    if (!selectedFile || !document.getElementById('diseaseType').value) {
+        alert('Please select both an image and a disease category');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+    formData.append('diseaseType', document.getElementById('diseaseType').value);
+
+    try {
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Display the uploaded image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('resultImage').src = e.target.result;
+            }
+            reader.readAsDataURL(selectedFile);
+
+            // Parse and display the analysis
+            const analysis = result.analysis;
+            document.getElementById('diagnosisResult').innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-4 bg-gray-800 rounded-lg">
+                        <p class="font-semibold text-green-400">Analysis for ${result.diseaseType}</p>
+                        <p class="mt-2">${analysis}</p>
+                    </div>
+                </div>
+            `;
+
+            showPage('resultsPage');
+        } else {
+            alert(result.error || 'Failed to analyze image');
+        }
+    } catch (error) {
+        alert('Error analyzing image: ' + error.message);
+    }
+});
+    </script>
+    
+</body>
+</html>
