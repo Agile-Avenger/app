@@ -25,3 +25,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/scan2.gif
+    - assets/scanlogo.png
+    - assets/user3.jpg

@@ -129,7 +129,7 @@ class ResultsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          diseaseType,
+                          analysisResult,
                           style: TextStyle(
                             fontSize: isSmallScreen ? 16 : 18,
                             color: Colors.white70,
