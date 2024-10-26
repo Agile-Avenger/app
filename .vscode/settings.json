@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/divye/Documents/Big-Project/flutter/app/flutter_frontend/linux"
+    "cmake.sourceDirectory": "C:/Users/divye/Documents/Big-Project/flutter/app/flutter_frontend/linux",
+    "C_Cpp.errorSquiggles": "disabled"
 }
